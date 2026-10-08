@@ -1,0 +1,53 @@
+{
+  "capabilityCheck": {
+    "status": "PASS",
+    "checks": [
+      {
+        "mode": "older-sdk",
+        "result": {
+          "clientDeclared": false,
+          "httpDeclared": false,
+          "clientAvailable": false,
+          "httpAvailable": false
+        },
+        "status": "PASS"
+      },
+      {
+        "mode": "backend-disabled",
+        "result": {
+          "clientDeclared": true,
+          "httpDeclared": true,
+          "clientAvailable": false,
+          "httpAvailable": false
+        },
+        "status": "PASS"
+      },
+      {
+        "mode": "verified-backend",
+        "result": {
+          "clientDeclared": true,
+          "httpDeclared": true,
+          "clientAvailable": true,
+          "httpAvailable": true
+        },
+        "status": "PASS"
+      }
+    ],
+    "publicSupportCommit": "cddb06ee5ac6bd39bb577098b11dfbea3b9b7b39",
+    "sourceHashesMatchG1": true,
+    "seconds": 5.323,
+    "firmwareBuilds": 0,
+    "tlsHandshakesRun": 0,
+    "device": "NOT_TESTED"
+  },
+  "sourceCodeChangesSinceG1": false,
+  "sdkFiles": "identical to G1 and G2 source manifests",
+  "reusedEvidence": {
+    "G1": "actual CP/SDKTLS12cases, fourreviewaxes, X4Probuild100.521s",
+    "G2": "actualTIMED/SDKTLS4cases, X4Probuild121.340s"
+  },
+  "newFirmwareBuilds": 0,
+  "newTlsHandshakes": 0,
+  "C3Heap": "NOT_MEASURED",
+  "SDKAcceptance": "PENDING"
+}

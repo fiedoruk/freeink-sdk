@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/fiedoruk/freeink-sdk.git",
+  "publicSupportCommit": "cddb06ee5ac6bd39bb577098b11dfbea3b9b7b39",
+  "sdkMainSourceBase": "425d200a8ea447326b4b9696e4e47dc84ad9d7f6",
+  "patchSha256": "fb49635219c9598343256c5806205c51c980678f6e92d5b2932fc35638eefbf4",
+  "publishedVerificationPatchSha256": "a97e8a4192949cc8d59289694711a3a9c14bcb7d2b63f6f4461722afd549f35f",
+  "wolfUserSettingsSha256": "82fa06f8b7ded750a95acdb5bb0c9eef08247ea3d8b54f753a924fe7608e572b",
+  "rawFiles": {
+    "libs/network/SecureNet/include/SecureClient.h": "b6251189f9a0b89753e132322d09440a5c66468e6c81e7d255c898ea1f941a43",
+    "libs/network/SecureNet/include/SecureHttpClient.h": "41609bd19cc8be0c28c1a0b4e9cf7ba3ec294924a12c0e302f62a248f72b69ee",
+    "libs/network/SecureNet/src/SecureClient.cpp": "544d404e40b81e254a418118623c01a207897b72f7297fd2275b1fe44160dfd5"
+  },
+  "resultFiles": {
+    "libs/network/SecureNet/include/SecureClient.h": "8a4be87d6fe7aebe252ee17146b493223eb04614c02f86b383036b41b3bc919b",
+    "libs/network/SecureNet/include/SecureHttpClient.h": "b1b7651c13470a255fa3f3c06bc5c67a0bb433751c3691d456c93e99fc2e1a95",
+    "libs/network/SecureNet/src/SecureClient.cpp": "1e44dd753ad58b621b79d8e64c32237881bff7eadaee988d3f31684cafc9758b"
+  }
+}

@@ -1,0 +1,46 @@
+diff --git a/libs/network/SecureNet/include/SecureClient.h b/libs/network/SecureNet/include/SecureClient.h
+index ec9fccc..15e1b51 100644
+--- a/libs/network/SecureNet/include/SecureClient.h
++++ b/libs/network/SecureNet/include/SecureClient.h
+@@ -71,6 +71,10 @@ class SecureClient : public Client {
+   // True if the library was built with wolfSSL TLS 1.3 support enabled.
+   static bool tls13Available();
+ 
++  // True when verified connections enforce CA loading and peer hostname checks.
++  // This reports backend support, not the verification state of a connection.
++  static bool peerVerificationAvailable();
++
+  private:
+   int connectWithMethod(const char* host, uint16_t port, void* method, const char* label);
+ 
+diff --git a/libs/network/SecureNet/include/SecureHttpClient.h b/libs/network/SecureNet/include/SecureHttpClient.h
+index aac21ef..cd7ca60 100644
+--- a/libs/network/SecureNet/include/SecureHttpClient.h
++++ b/libs/network/SecureNet/include/SecureHttpClient.h
+@@ -51,6 +51,7 @@ namespace freeink {
+ 
+ class SecureHttpClient {
+  public:
++  static bool peerVerificationAvailable() { return SecureClient::peerVerificationAvailable(); }
+   using DataCallback = std::function<bool(const uint8_t* data, size_t len)>;
+   using AbortCallback = std::function<bool()>;
+   // (bytes so far, total from Content-Length or 0 when unknown).
+diff --git a/libs/network/SecureNet/src/SecureClient.cpp b/libs/network/SecureNet/src/SecureClient.cpp
+index 8e33bb6..e0abc7a 100644
+--- a/libs/network/SecureNet/src/SecureClient.cpp
++++ b/libs/network/SecureNet/src/SecureClient.cpp
+@@ -17,6 +17,14 @@ bool SecureClient::tls13Available() {
+ #endif
+ }
+ 
++bool SecureClient::peerVerificationAvailable() {
++#if defined(FREEINK_NET_WOLFSSL)
++  return true;
++#else
++  return false;
++#endif
++}
++
+ SecureClient::~SecureClient() { stop(); }
+ 
+ void SecureClient::setCACert(const char* rootCA) { _rootCA = rootCA; }

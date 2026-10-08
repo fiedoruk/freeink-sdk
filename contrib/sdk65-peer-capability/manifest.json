@@ -1,0 +1,42 @@
+{
+  "scope": "SDK_CAPABILITY_SUPPLEMENT_ONLY",
+  "publicationAuthorized": false,
+  "files": {
+    "LICENSE": {
+      "sha256": "17dea5079d9905fbbc8323cde7bfffd0f24185949c43a5daad5177022b796588",
+      "bytes": 1064
+    },
+    "NOTICE": {
+      "sha256": "1a45b9f057b415f84085d808bd12ec5df1296808ad14bd9583f2a585c84290ff",
+      "bytes": 1968
+    },
+    "README.md": {
+      "sha256": "0203e3d8438af18a4de1807107f4383d530558635daa9160ab130fa410ee4b00",
+      "bytes": 2901
+    },
+    "check.py": {
+      "sha256": "c79f2f39df5bde3855d200f29b528cfef46dd2148c243debad1ff5591f8d2cc2",
+      "bytes": 4900
+    },
+    "sdk-peer-capability.patch": {
+      "sha256": "fb49635219c9598343256c5806205c51c980678f6e92d5b2932fc35638eefbf4",
+      "bytes": 1899
+    },
+    "sources.json": {
+      "sha256": "46ba12a491a1552c9e1337710fe3ed4832a182d3d2a690c4afba09f1930fccb8",
+      "bytes": 1262
+    },
+    "validation.json": {
+      "sha256": "7b00f9d1f16f5b40842eac066ba1511885aae939505e7474858a4962adef588e",
+      "bytes": 1365
+    }
+  },
+  "excluded": [
+    "private-bench",
+    "SaaS/accounts/renderer/templates",
+    "CP caller source",
+    "firmware/crypto binaries",
+    "wiki/HTML",
+    "newcomment or PR"
+  ]
+}
