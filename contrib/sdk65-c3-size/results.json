@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-11",
+  "level": "BUILD_ONLY",
+  "target": "default ESP32-C3",
+  "cp": "44626dd5bcc289b0c6b4a0615232e74e1a1d2a8e plus same subdir guard both sides",
+  "sdk": "425d200a8ea447326b4b9696e4e47dc84ad9d7f6",
+  "transportSourceAlsoMatchesMain": "2ca5e31e6837f950ed9fc63edfcefbaee9c3fcaf",
+  "baseline": {
+    "staticRamBytes": 59168,
+    "flashBytes": 5922777,
+    "firmwareBinSha256": "16a45252887d3a38d9214942b06797b2c46a65c632ac23645b693ada66a265a4",
+    "firmwareBinBytes": 5936944,
+    "wallSeconds": 149.791
+  },
+  "verified": {
+    "staticRamBytes": 59168,
+    "flashBytes": 5923141,
+    "firmwareBinSha256": "7b5b2fb98bbdbb7aeb65cf3b5648b5e9008488216d8dd0fb0f09b7a8d97f21b1",
+    "firmwareBinBytes": 5937312,
+    "wallSeconds": 17.828
+  },
+  "deltaBytes": {
+    "staticRam": 0,
+    "flash": 364,
+    "firmwareBin": 368
+  },
+  "sectionsChanged": {
+    ".flash.text": {
+      "baseline": 2365064,
+      "verified": 2365284,
+      "delta": 220
+    },
+    ".flash.rodata": {
+      "baseline": 3470336,
+      "verified": 3470480,
+      "delta": 144
+    }
+  },
+  "controlledComparison": {
+    "cpSourcesIdentical": true,
+    "effectiveConfigIdentical": true,
+    "sdkChangedFiles": [
+      "libs/network/SecureNet/src/SecureClient.cpp"
+    ],
+    "sameCheckoutCacheToolchain": true
+  },
+  "runtimeHeap": "NOT_MEASURED",
+  "device": "NOT_MEASURED",
+  "ota": "NOT_MEASURED",
+  "scope": "Marginal size of two verification hunks in existing wolfSSL firmware; no new CA bundle or capability API",
+  "textSymbolChanges": {
+    "wolfSSL_check_domain_name": {
+      "baseline": [],
+      "verified": [
+        [
+          "T",
+          134
+        ]
+      ]
+    },
+    "freeink::SecureClient::connectWithMethod(char const*, unsigned short, void*, char const*)": {
+      "baseline": [
+        [
+          "T",
+          772
+        ]
+      ],
+      "verified": [
+        [
+          "T",
+          858
+        ]
+      ]
+    }
+  },
+  "toolchain": {
+    "platform": "pioarduino55.03.311",
+    "arduino": "3.3.11",
+    "idf": "5.5.5",
+    "gcc": "riscv32-esp-elf14.2.0"
+  }
+}

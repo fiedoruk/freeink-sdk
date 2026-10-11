@@ -1,0 +1,20 @@
+{
+  "cp": {
+    "url": "https://github.com/crosspoint-reader/crosspoint-reader.git",
+    "commit": "44626dd5bcc289b0c6b4a0615232e74e1a1d2a8e"
+  },
+  "sdk": {
+    "url": "https://github.com/Free-Ink/freeink-sdk.git",
+    "commit": "425d200a8ea447326b4b9696e4e47dc84ad9d7f6"
+  },
+  "target": "default",
+  "patches": {
+    "sdk65-compatible.patch": "a97e8a4192949cc8d59289694711a3a9c14bcb7d2b63f6f4461722afd549f35f",
+    "subdir-guards.patch": "62ae876800351266d56e999b9a215817f58f7cea71c1737b5e4dfa451064442b"
+  },
+  "cpResultSha256": "7289bc3b64e195ed7e48fb0fe705a7cb024945dddf42755d088453d69236f432",
+  "sdkBeforeSha256": "544d404e40b81e254a418118623c01a207897b72f7297fd2275b1fe44160dfd5",
+  "sdkAfterSha256": "56dfc396ec6d4640033466b3faaa6ce6530a29c47336ea6b651dd5ae0a1536a9",
+  "sdk65PublicSource": "https://github.com/fiedoruk/freeink-sdk/tree/cddb06ee5ac6bd39bb577098b11dfbea3b9b7b39/contrib/sdk65-verification",
+  "codeReuse": "same patch; G1 source hash comparison in private evidence"
+}

@@ -1,0 +1,15 @@
+diff --git a/src/activities/plugins/PluginCatalogActivity.cpp b/src/activities/plugins/PluginCatalogActivity.cpp
+index 4fb2e1c7..5936cd19 100644
+--- a/src/activities/plugins/PluginCatalogActivity.cpp
++++ b/src/activities/plugins/PluginCatalogActivity.cpp
+@@ -787,7 +787,9 @@ HttpDownloader::DownloadError PluginCatalogActivity::downloadBundle(const Item&
+   session.reset();
+   const std::string subdir = substituted(manifest.bundleSubdir, &item);
+   // Reject path traversal in the subdir (a hostile catalog could escape).
+-  if (subdir.empty() || subdir.find("..") != std::string::npos || subdir.front() == '/') {
++  if (subdir.empty() || subdir == "." || subdir.find("..") != std::string::npos || subdir.front() == '/' ||
++      subdir.find('\\') != std::string::npos) {
++    LOG_ERR("PCAT", "unsafe bundle subdirectory");
+     return HttpDownloader::FILE_ERROR;
+   }
+   std::string root = downloadDir();
