@@ -9,6 +9,12 @@ The candidate compiles for C3 and has host checks. **Physical C3 heap, fragmenta
 and energy remain unmeasured.** Its source composition is documented separately;
 do not treat the earlier static-size difference as its instrumentation overhead.
 
+The current diagnostic pins SDK `7fcd3b34`, including the UC8279 transaction fix
+from [SDK #139](https://github.com/Free-Ink/freeink-sdk/pull/139).
+The probe and TLS code are unchanged from the
+[earlier diagnostic revision](https://github.com/fiedoruk/freeink-sdk/tree/6363296adedf53362278d63f91180fe569266cd4/contrib/sdk65-c3-size/runtime).
+See the packet validation notes for its new C3 build and inherited host evidence.
+
 The original comparison, patches, results and archive below are preserved.
 
 This compares the already published adaptation of sfoulad's CA-load and

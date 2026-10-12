@@ -4,7 +4,19 @@ The CP/SDK sources in this package reconstruct from the public refs and patches
 listed in `source-lock.json`. The SDK override is explicit. The candidate is a
 temporary diagnostic build, not a C3 runtime result or an official CP release.
 
-## Checks completed
+## SDK refresh
+
+The SDK base changes from `1a5448df` to `7fcd3b34`; CP remains `fc3aed12`.
+The only upstream source change ends an existing UC8279 SPI transaction before
+the next command. It does not change the probe, SecureNet, test fixtures or
+measurement contract. Previous host results apply to identical checked sources.
+A fresh receiver reconstructed this revision from both public refs and applied
+the unchanged patches. The C3 build passed with these sources. Four independent
+reviews covered this SDK delta; metadata corrections aligned the identity
+template and archive links. The older firmware receipt is historical, not
+validation of the new SDK base. No physical C3 was tested.
+
+## Earlier checks retained for unchanged diagnostic/TLS sources
 
 - Four independent review axes covered correctness, architecture, embedded
   behavior and documentation. One grouped repair and a targeted follow-up
@@ -19,16 +31,20 @@ temporary diagnostic build, not a C3 runtime result or an official CP release.
   cases passed. The radio, CPU and heap boundaries in these tests are mocks.
 - A separate receiver reconstructed the public sources and final source hashes.
   The affected flow, contract and parser checks also passed there.
-- The final `default` ESP32-C3 X3/X4 diagnostic target compiled and linked with
-  Arduino 3.3.11 / ESP-IDF 5.5.5, the pinned 55.03.311 platform and the packaged
-  probe flags. Source hashes remained unchanged during the build.
 
-Firmware SHA-256: `1d0eb5184a4d3cf1fef8834c9ac01e2bcb2547b9134725dad2993b57056d39a2`.
+## Build for this SDK revision
+
+The `default` ESP32-C3 X3/X4 diagnostic target compiled and linked with
+Arduino 3.3.11 / ESP-IDF 5.5.5, the pinned 55.03.311 platform and the packaged
+probe flags. Source hashes remained unchanged during the build.
+
+Firmware SHA-256: `15a5c2d423f41a4fd14ece4e40a41eb0b78404e22500d3bcff802d7825b0f397`.
 The BIN is 5897536 bytes and is not included in this source package.
-The linker's static RAM figure is 63,664 bytes; linked flash usage is 5,883,361 bytes.
+The linker's static RAM figure is 63,664 bytes; linked flash usage is 5,883,367 bytes.
 These are build figures, not available runtime heap or peak TLS usage.
-The named static probe symbols total 4,481 bytes. This sum excludes linker padding,
-SDK client counters/stack and transient allocations; it is not a full firmware delta.
+The earlier build counted 4,481 bytes in named static probe symbols. That is
+historical evidence for unchanged probe code, excluding linker padding, SDK
+client counters/stack and transient allocations; it is not a full firmware delta.
 
 ## Required C3 run
 

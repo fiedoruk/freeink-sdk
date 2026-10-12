@@ -5,7 +5,7 @@
   },
   "sdk": {
     "url": "https://github.com/Free-Ink/freeink-sdk.git",
-    "commit": "1a5448dfa705d6499fbff20371539bf553865dd2"
+    "commit": "7fcd3b34c108f28c086ade3b433924022dbc0998"
   },
   "target": "default",
   "sdk65_pr_head_reference_only": "6d33e9fd8c6fd1c53c40c0ef1ccaa4535606610a",
@@ -16,7 +16,7 @@
   },
   "files": {
     "CP-LICENSE.txt": "5d025639b5237e35cf93c4ca598ebde40f31f032bf9a9a19fceb3703dca68b84",
-    "README.md": "74769b18c0358859ccee8da72bc3ebd738abe2975bfb20a12028990d21bb5c92",
+    "README.md": "5a8907351aede925455fac7b458a4ba0d37bfba0644a04afbefda8cb9b3a5c3d",
     "SDK-LICENSE.txt": "17dea5079d9905fbbc8323cde7bfffd0f24185949c43a5daad5177022b796588",
     "build_wolfssl.py": "75bc73baf363c3ea1a1616786885e9a9c447cb560a6b138918bf2b46d310ba56",
     "certificates.py": "82c4e8d233216d7767b34a60fd1e76b846e416975f1d4435d191bc4cfd6446b9",
@@ -40,7 +40,7 @@
     "host/stubs/WiFi.h": "934a666eb5e6ba576b62c8c3ab4b1e18bc4b2b852ce6a2d19183de3c6d82ec8f",
     "host/stubs/WiFiClient.h": "3981ec0b67fcedbc19b8b5c806ceb36dbf097877a44c9d88fe9449a0df8a8a2d",
     "host/stubs/esp_heap_caps.h": "2b4f26de51a4596c1c71b96b4ca74833baffccb16acee5a8bb3a21afa4f34acc",
-    "identity-template.json": "305e5d0f8fff207fb04d3db8af6efe3602d7735ecd8ad52b1047987ae2e4b9c1",
+    "identity-template.json": "2dd62d853427ee86001d805ed1d913ffaffc3ecafb6efd5eb21be95d2f100dfd",
     "parse_results.py": "0f81e332a6f1fe7fe6c5502d29ce6ca94c84f32d8292ed4eec3af2badb64ccb2",
     "platformio.local.ini": "faa0fe91a974a71ce9c2dabbe77bda9c4076f6f8ebcb388e6b3c211eabb6b798",
     "reproduce.py": "623027453b5652cc58ca7b5c71884f69a2566b1cb81121c1d635be004bb7ded9",
@@ -48,7 +48,7 @@
     "sdk-runtime.patch": "01f203969156a1840d106822d33ce15f0ab0cbd5ca6562eddaeefbbf0582f9e8",
     "sdk65-compatible.patch": "a97e8a4192949cc8d59289694711a3a9c14bcb7d2b63f6f4461722afd549f35f",
     "test_parser.py": "35e49e72d2c52700fac95da20210c88ca37a8d20efb32daa95a3163ce13fe99b",
-    "VALIDATION.md": "8c7b832c1cdd8569aa645dfe9f7e9abc491679c8eee2ff7c3d7d0ebba7eae215"
+    "VALIDATION.md": "7f67a0ba3fd034938807d25823ca30ee3e38ee37862bf4bd1b3bc34c41faa63b"
   },
   "result_files": {
     "src/main.cpp": "01ebd2b24b86b8df5f08d34852a13fb3b28551a331179c421a2f3e97d1b3b861",

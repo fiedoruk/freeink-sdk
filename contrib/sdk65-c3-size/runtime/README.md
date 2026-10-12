@@ -6,13 +6,20 @@ in SDK #65. It is a tester package, not a C3 result, an OTA qualification, or a
 new TLS implementation. No physical C3 was identified while preparing it.
 
 The source composition is CP PR #3877 at `fc3aed12100e3149cae6128a321c902f056786cc`
-and SDK main `1a5448dfa705d6499fbff20371539bf553865dd2`, plus the already published
+and SDK main `7fcd3b34c108f28c086ade3b433924022dbc0998`, plus the already published
 SDK65 compatibility checks and this diagnostic patch. The SDK differs from CP's
 raw gitlink; `source-lock.json` records that deliberate override. SDK #65's raw
 PR head is **not** the SDK used by this candidate. The diagnostic follows the
 before/after sampling in SDK #14 (`34aabdf2c8045dc90df6ec1b95f974224d8fcf37`)
 without importing its insecure fallback. Existing `AbortCallback` is already
 present at the selected SDK main ref.
+
+This revision includes [SDK #139](https://github.com/Free-Ink/freeink-sdk/pull/139),
+which ends the UC8279 strip transaction before sending `CMD_PARTIAL_OUT`.
+Without that fix, X3 text antialiasing can block rendering before the
+`reader_ui` probe starts. The diagnostic patches and TLS code are unchanged.
+The earlier package remains available at its
+[immutable revision](https://github.com/fiedoruk/freeink-sdk/tree/6363296adedf53362278d63f91180fe569266cd4/contrib/sdk65-c3-size/runtime).
 
 ## Reconstruct and build
 
