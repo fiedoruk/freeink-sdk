@@ -1,0 +1,18 @@
+{
+  "base": "6d33e9fd8c6fd1c53c40c0ef1ccaa4535606610a",
+  "patchSha256": "72bf85b07a52120079b81793244b4f13630b358411c38746030ac3598cf7ac05",
+  "files": {
+    "LICENSE": "17dea5079d9905fbbc8323cde7bfffd0f24185949c43a5daad5177022b796588",
+    "NOTICE": "1a45b9f057b415f84085d808bd12ec5df1296808ad14bd9583f2a585c84290ff",
+    "README.md": "ab5eefa59b561fa5b805bc6f8d2150cd039bfccba220535d1e900b9349f5142a",
+    "comment.en.md": "b17ce7eed947face007827451a8e96ea56cd90362cce546f3da5a38a956f90d1",
+    "complete-headers.patch": "72bf85b07a52120079b81793244b4f13630b358411c38746030ac3598cf7ac05",
+    "replay.py": "d0e575c8fe2c65516bb2c5356bf218f27652032b436849f5a98a83c649a60cd0",
+    "tests/stubs/Arduino.h": "d76b7604f0a5bff1c775e1ee980a612e716f820a8fb4868c12e97ca96f6b4622",
+    "tests/stubs/Client.h": "fdc7a32407bd4ec7f6c25da38892f80b847cf8285decc8f7084903648d086029",
+    "tests/stubs/WiFiClient.h": "74098f28243d51d90f174601cb812e8a8074bdf4706df055de13fcaf40eeacdb",
+    "tests/stubs/base64.h": "274f5ff9851b58194a60980b2d34def14a380534fc8f95ecafcfbe5914c6b156",
+    "tests/test_http_headers.cpp": "af22fcd4cc12269521c60ca82ab5405a8715b7fa7eae99c8e1a8f6c3bddd62ac",
+    "tests/test_secure_client_stubs.h": "12cafdf47338b008dec65e035be63e0ceaa8fb28807304bcb0be163176bbf863"
+  }
+}

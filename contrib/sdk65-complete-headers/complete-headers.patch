@@ -1,0 +1,27 @@
+diff --git a/libs/network/SecureNet/include/SecureHttpClient.h b/libs/network/SecureNet/include/SecureHttpClient.h
+index b5040d2..1acff7d 100644
+--- a/libs/network/SecureNet/include/SecureHttpClient.h
++++ b/libs/network/SecureNet/include/SecureHttpClient.h
+@@ -233,8 +233,12 @@ class SecureHttpClient {
+       bool keepAlive = line.compare(0, 9, "HTTP/1.0 ") != 0;
+ 
+       std::string transferEncoding;
++      bool headersComplete = false;
+       while (readLine(*_conn, line, headerDeadline, shouldAbort)) {
+-        if (line.empty()) break;  // end of headers
++        if (line.empty()) {
++          headersComplete = true;
++          break;
++        }
+         const size_t colon = line.find(':');
+         if (colon == std::string::npos) continue;
+         std::string name = line.substr(0, colon);
+@@ -257,7 +261,7 @@ class SecureHttpClient {
+           else if (v.find("keep-alive") != std::string::npos) keepAlive = true;
+         }
+       }
+-      if (_aborted) {
++      if (_aborted || !headersComplete) {
+         closeConnection();
+         return -1;
+       }
