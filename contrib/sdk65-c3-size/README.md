@@ -1,5 +1,16 @@
 # C3 size comparison for the SDK #65 compatibility patch
 
+## Runtime diagnostic package — 12 October 2026
+
+The [opt-in C3 runtime probe](runtime/README.md) extends the measurement protocol
+below with executable code, a local TLS fixture, paired boot/reader contexts,
+a result parser and a [source ZIP](runtime/G10-tester-packet.zip).
+The candidate compiles for C3 and has host checks. **Physical C3 heap, fragmentation
+and energy remain unmeasured.** Its source composition is documented separately;
+do not treat the earlier static-size difference as its instrumentation overhead.
+
+The original comparison, patches, results and archive below are preserved.
+
 This compares the already published adaptation of sfoulad's CA-load and
 hostname-verification changes against the original SDK. It does not introduce
 a new TLS implementation, include a CA bundle, change insecure legacy calls,

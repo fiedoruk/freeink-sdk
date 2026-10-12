@@ -1,0 +1,25 @@
+{
+  "status": "NOT_MEASURED",
+  "device": {
+    "model": null,
+    "chip": "ESP32-C3",
+    "revision": null
+  },
+  "source": {
+    "cpRef": "fc3aed12100e3149cae6128a321c902f056786cc",
+    "sdkRef": "1a5448dfa705d6499fbff20371539bf553865dd2",
+    "firmwareSha256": null
+  },
+  "rootSha256": null,
+  "readerWorkload": {
+    "epubSha256": null,
+    "font": null,
+    "fontSize": null,
+    "orientation": null,
+    "page": null,
+    "concurrentWorkers": null
+  },
+  "physicalC3": "NOT_IDENTIFIED",
+  "energy": "NOT_MEASURED",
+  "ota": "NOT_MEASURED"
+}

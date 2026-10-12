@@ -1,0 +1,428 @@
+diff --git a/src/activities/reader/EpubReaderActivity.cpp b/src/activities/reader/EpubReaderActivity.cpp
+index 5ab646f..2c18bcd 100644
+--- a/src/activities/reader/EpubReaderActivity.cpp
++++ b/src/activities/reader/EpubReaderActivity.cpp
+@@ -56,6 +56,7 @@
+ #include "util/BookmarkUtil.h"
+ #include "util/ButtonNavigator.h"
+ #include "util/ScreenshotUtil.h"
++#include "util/TlsMemoryProbe.h"
+ 
+ namespace {
+ // The X4 Pro and X4 Classic carry the X4's panel but sit outside isXteinkDevice()
+@@ -559,6 +560,15 @@ void EpubReaderActivity::loop() {
+     return;
+   }
+ 
++#if defined(CROSSPOINT_TLS_MEMORY_PROBE)
++  {
++    RenderLock lock(RenderLock::Mode::Try);
++    if (lock.ownsLock() && section && !section->isBuilding() && lastRenderCompleteMs != 0) {
++      tlsmemoryprobe::readerUi();
++    }
++  }
++#endif
++
+   rememberBookOnceRendered();
+ 
+   // Someone else turned the screen while this reader was stacked (the control
+diff --git a/src/main.cpp b/src/main.cpp
+index 02efa4c..2e393e6 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -42,6 +42,7 @@
+ #include "util/PluginEvents.h"
+ #include "util/ScreenshotUtil.h"
+ #include "util/Timezones.h"
++#include "util/TlsMemoryProbe.h"
+ 
+ #if CROSSPOINT_VECTOR_FONTS
+ // Rendering (incl. FreeType TTF rasterization) runs on the Arduino loop task.
+@@ -494,6 +495,10 @@ void setup() {
+     return;
+   }
+ 
++#if defined(CROSSPOINT_TLS_MEMORY_PROBE)
++  tlsmemoryprobe::earlyBoot();
++#endif
++
+   HalSystem::checkPanic();
+ 
+   APP_STATE.loadFromFile();
+@@ -729,6 +734,9 @@ void loop() {
+     if (line.startsWith("CMD:")) {
+       String cmd = line.substring(4);
+       cmd.trim();
++#if defined(CROSSPOINT_TLS_MEMORY_PROBE)
++      if (cmd == "G10") tlsmemoryprobe::requestReaderUi();
++#endif
+       if (cmd == "SCREENSHOT") {
+         const uint32_t bufferSize = display.getBufferSize();
+         logSerial.printf("SCREENSHOT_START:%d\n", bufferSize);
+diff --git a/src/util/TlsMemoryProbe.cpp b/src/util/TlsMemoryProbe.cpp
+new file mode 100644
+index 0000000..9fba254
+--- /dev/null
++++ b/src/util/TlsMemoryProbe.cpp
+@@ -0,0 +1,244 @@
++#include "TlsMemoryProbe.h"
++#if defined(CROSSPOINT_TLS_MEMORY_PROBE)
++#include <Arduino.h>
++#include <HalPowerManager.h>
++#include <HalStorage.h>
++#include <Logging.h>
++#include <SecureClient.h>
++#include <WiFi.h>
++#include <esp_heap_caps.h>
++#include <sys/time.h>
++
++#include "TlsProbeConfig.h"
++#include "TlsProbeWindow.h"
++
++namespace tlsmemoryprobe {
++namespace {
++constexpr uint32_t CAPS = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
++constexpr uint32_t TIMEOUT_MS = 2000;
++Config config;
++char root[2048];
++char unknownRoot[2048];
++char buffer[192];
++bool armed = false;
++bool ran = false;
++bool requested = false;
++bool ownsWifi = false;
++bool active = false;
++unsigned nextCase = 0;
++struct HeapSample {
++  size_t free;
++  size_t largest;
++};
++HeapSample sample() { return {heap_caps_get_free_size(CAPS), heap_caps_get_largest_free_block(CAPS)}; }
++const char* contextName() { return config.context == Context::EarlyBoot ? "early_boot" : "reader_ui"; }
++
++bool loadPem(const char* path, char* destination, size_t capacity) {
++  HalFile file;
++  if (!Storage.openFileForRead("G10", path, file)) return false;
++  const size_t length = file.size();
++  if (length == 0 || length >= capacity || file.read(destination, length) != static_cast<int>(length)) return false;
++  destination[length] = '\0';
++  return strlen(destination) == length;
++}
++
++bool loadConfig() {
++  HalFile file;
++  if (!Storage.openFileForRead("G10", "/.crosspoint/g10/probe.conf", file)) return false;
++  if (file.size() > 1024) return false;
++  size_t length = 0;
++  while (file.available()) {
++    const int ch = file.read();
++    if (ch < 0) return false;
++    if (ch == '\n') {
++      buffer[length] = '\0';
++      if (length && buffer[length - 1] == '\r') buffer[--length] = '\0';
++      if (!parseLine(config, buffer)) return false;
++      length = 0;
++    } else {
++      if (length + 1 >= sizeof(buffer)) return false;
++      buffer[length++] = static_cast<char>(ch);
++    }
++  }
++  if (length) {
++    buffer[length] = '\0';
++    if (!parseLine(config, buffer)) return false;
++  }
++  return complete(config) && loadPem("/.crosspoint/g10/root.pem", root, sizeof(root)) &&
++         loadPem("/.crosspoint/g10/unknown.pem", unknownRoot, sizeof(unknownRoot));
++}
++
++void releaseNetwork() {
++  if (!ownsWifi) return;
++  WiFi.disconnect(false, false);
++  WiFi.mode(WIFI_OFF);
++  if (WiFi.getMode() != WIFI_MODE_NULL) {
++    logSerial.println("G10_ERROR radio_cleanup_failed");
++    return;
++  }
++  ownsWifi = false;
++}
++
++bool prepareNetwork() {
++  if (WiFi.getMode() != WIFI_MODE_NULL || WiFi.status() == WL_CONNECTED) return false;
++  WiFi.persistent(false);
++  ownsWifi = true;
++  if (!WiFi.mode(WIFI_STA)) return false;
++  WiFi.begin(config.ssid, config.password);
++  const uint32_t start = millis();
++  while (WiFi.status() != WL_CONNECTED && millis() - start < 15000) delay(20);
++  if (WiFi.status() != WL_CONNECTED) return false;
++  // The tester supplies the fixture clock; this does not qualify SNTP.
++  timeval clock = {static_cast<time_t>(config.epoch), 0};
++  return settimeofday(&clock, nullptr) == 0;
++}
++
++bool runCase(const char* name, uint16_t port, const char* ca, unsigned repetition, bool cancel) {
++  const uint32_t cpuMhz = getCpuFrequencyMhz();
++  freeink::SecureClient client;
++  client.setTimeout(TIMEOUT_MS);
++  uint32_t connectStart = 0;
++  if (cancel) client.setAbortCallback([&connectStart]() { return millis() - connectStart >= 100; });
++  const HeapSample before = sample();
++  const size_t lifetimeBefore = heap_caps_get_minimum_free_size(CAPS);
++  client.setCACert(ca);
++  HeapWindow window;
++  connectStart = millis();
++  const bool connected = window.owned() && client.connect(config.host, port) == 1;
++  const uint32_t connectMs = millis() - connectStart;
++  const HeapSample afterConnect = sample();
++  window.finish();
++  size_t written = 0;
++  size_t received = 0;
++  bool responseOk = false;
++  if (connected && window.stopCalled && window.stopResult == ESP_OK) {
++    const int length =
++        snprintf(buffer, sizeof(buffer),
++                 "GET /G10_PROTECTED/%s/%u HTTP/1.1\r\nHost: fixture\r\nConnection: close\r\n\r\n", name, repetition);
++    const uint32_t ioStart = millis();
++    while (written < static_cast<size_t>(length) && millis() - ioStart < TIMEOUT_MS) {
++      written += client.write(reinterpret_cast<const uint8_t*>(buffer) + written, length - written);
++      delay(5);
++    }
++    while (received + 1 < sizeof(buffer) && millis() - ioStart < TIMEOUT_MS) {
++      const int read = client.read(reinterpret_cast<uint8_t*>(buffer) + received, sizeof(buffer) - received - 1);
++      if (read > 0)
++        received += read;
++      else if (read < 0 || !client.connected())
++        break;
++      delay(5);
++    }
++    buffer[received] = '\0';
++    responseOk = strstr(buffer, "HTTP/1.1 200 ") == buffer && strstr(buffer, "\r\n\r\nG10_OK") != nullptr;
++  }
++  const HeapSample afterResponse = sample();
++  const bool aborted = client.aborted();
++  const auto stats = client.probeStats();
++  client.stop();
++  const HeapSample afterStop = sample();
++  const size_t lifetimeAfter = heap_caps_get_minimum_free_size(CAPS);
++  // Emit only after the allocator window and connection have both ended.
++  logSerial.printf(
++      "G10 {\"schema\":1,\"context\":\"%s\",\"case\":\"%s\",\"repeat\":%u,\"cpu_mhz\":%u,"
++      "\"monitor_start\":%d,\"monitor_stop\":%d,\"monitor_stop_called\":%s,\"window_min\":%u,"
++      "\"lifetime_before\":%u,\"lifetime_after\":%u,"
++      "\"before\":[%u,%u],\"connect\":[%u,%u],\"response\":[%u,%u],\"stop\":[%u,%u],"
++      "\"sampled_free\":%u,\"sampled_largest\":%u,\"attempts\":%u,\"connect_calls\":%u,"
++      "\"timeouts\":%u,\"last_error\":%d,\"tls\":\"%s\",\"cipher\":\"%s\",\"connect_ms\":%u,"
++      "\"total_ms\":%u,\"connected\":%s,\"aborted\":%s,\"written\":%u,\"received\":%u,\"response_ok\":%s}\n",
++      contextName(), name, repetition, cpuMhz, window.startResult, window.stopResult,
++      window.stopCalled ? "true" : "false", static_cast<unsigned>(window.minimum),
++      static_cast<unsigned>(lifetimeBefore), static_cast<unsigned>(lifetimeAfter), static_cast<unsigned>(before.free),
++      static_cast<unsigned>(before.largest), static_cast<unsigned>(afterConnect.free),
++      static_cast<unsigned>(afterConnect.largest), static_cast<unsigned>(afterResponse.free),
++      static_cast<unsigned>(afterResponse.largest), static_cast<unsigned>(afterStop.free),
++      static_cast<unsigned>(afterStop.largest), static_cast<unsigned>(stats.sampledFree),
++      static_cast<unsigned>(stats.sampledLargest), stats.attempts, stats.connectCalls, stats.timeouts, stats.lastError,
++      stats.version, stats.cipher, connectMs, millis() - connectStart, connected ? "true" : "false",
++      aborted ? "true" : "false", static_cast<unsigned>(written), static_cast<unsigned>(received),
++      responseOk ? "true" : "false");
++  return window.owned() && window.stopCalled && window.stopResult == ESP_OK;
++}
++
++bool beginRun() {
++  HalPowerManager::Lock powerLock;
++  ran = true;
++  if (!prepareNetwork()) {
++    releaseNetwork();
++    logSerial.println("G10_ERROR preparation_failed");
++    return false;
++  }
++  logSerial.printf(
++      "G10_META {\"schema\":1,\"context\":\"%s\",\"chip\":\"%s\",\"revision\":%u,"
++      "\"psram\":%u,\"flash\":%u,\"epoch\":%u,\"config_static_bytes\":%u,\"cpu_mhz\":%u}\n",
++      contextName(), ESP.getChipModel(), ESP.getChipRevision(), ESP.getPsramSize(), ESP.getFlashChipSize(),
++      config.epoch, static_cast<unsigned>(sizeof(config) + sizeof(root) + sizeof(unknownRoot) + sizeof(buffer)),
++      getCpuFrequencyMhz());
++  return true;
++}
++void step() {
++  HalPowerManager::Lock powerLock;
++  bool monitorOk = false;
++  if (nextCase < 20) {
++    const bool tls13 = (nextCase & 1) != 0;
++    monitorOk = runCase(tls13 ? "tls13" : "tls12", config.ports[tls13 ? 1 : 0], root, nextCase / 2 + 1, false);
++  } else {
++    switch (nextCase) {
++      case 20:
++        monitorOk = runCase("wronghost", config.ports[2], root, 1, false);
++        break;
++      case 21:
++        monitorOk = runCase("unknownca", config.ports[0], unknownRoot, 1, false);
++        break;
++      case 22:
++        monitorOk = runCase("malformedca", config.ports[0], "not a PEM certificate", 1, false);
++        break;
++      case 23:
++        monitorOk = runCase("stall", config.ports[3], root, 1, false);
++        break;
++      case 24:
++        monitorOk = runCase("abort", config.ports[3], root, 1, true);
++        break;
++      case 25:
++        monitorOk = runCase("drop", config.ports[4], root, 1, false);
++        break;
++    }
++  }
++  if (!monitorOk) {
++    active = false;
++    releaseNetwork();
++    logSerial.println("G10_ERROR monitor_failed");
++    return;
++  }
++  if (++nextCase == 26) {
++    active = false;
++    releaseNetwork();
++    logSerial.println("G10_END");
++  }
++}
++}  // namespace
++void earlyBoot() {
++  armed = loadConfig();
++  if (!armed) {
++    logSerial.println("G10_ERROR configuration_missing_or_invalid");
++    return;
++  }
++  if (config.context == Context::EarlyBoot) {
++    active = beginRun();
++    while (active) step();
++  } else
++    logSerial.println("G10_ARMED open EPUB, then send CMD:G10 after the first page renders");
++}
++void requestReaderUi() {
++  if (armed && !ran && config.context == Context::ReaderUi) requested = true;
++}
++void readerUi() {
++  if (!armed || config.context != Context::ReaderUi) return;
++  if (!ran && requested) {
++    requested = false;
++    active = beginRun();
++  }
++  if (active) step();
++}
++}  // namespace tlsmemoryprobe
++#endif
+diff --git a/src/util/TlsMemoryProbe.h b/src/util/TlsMemoryProbe.h
+new file mode 100644
+index 0000000..a6b1068
+--- /dev/null
++++ b/src/util/TlsMemoryProbe.h
+@@ -0,0 +1,8 @@
++#pragma once
++#if defined(CROSSPOINT_TLS_MEMORY_PROBE)
++namespace tlsmemoryprobe {
++void earlyBoot();
++void requestReaderUi();
++void readerUi();
++}  // namespace tlsmemoryprobe
++#endif
+diff --git a/src/util/TlsProbeConfig.h b/src/util/TlsProbeConfig.h
+new file mode 100644
+index 0000000..df59084
+--- /dev/null
++++ b/src/util/TlsProbeConfig.h
+@@ -0,0 +1,69 @@
++#pragma once
++#include <cerrno>
++#include <cstdint>
++#include <cstdlib>
++#include <cstring>
++
++namespace tlsmemoryprobe {
++enum class Context { EarlyBoot, ReaderUi };
++struct Config {
++  Context context = Context::EarlyBoot;
++  char host[64] = {};
++  char ssid[33] = {};
++  char password[65] = {};
++  uint32_t epoch = 0;
++  uint16_t ports[5] = {};
++  uint16_t seen = 0;
++};
++inline bool parseLine(Config& config, char* line) {
++  const char* keys[] = {"context", "host", "ssid", "password", "epoch", "tls12", "tls13", "wronghost", "stall", "drop"};
++  char* equal = strchr(line, '=');
++  if (!equal) return false;
++  *equal = '\0';
++  const char* value = equal + 1;
++  for (const char* p = value; *p; ++p)
++    if (static_cast<unsigned char>(*p) < 32) return false;
++  unsigned index = 0;
++  while (index < 10 && strcmp(line, keys[index]) != 0) ++index;
++  if (index == 10 || (config.seen & (1U << index))) return false;
++  if (index == 0) {
++    if (strcmp(value, "early_boot") == 0)
++      config.context = Context::EarlyBoot;
++    else if (strcmp(value, "reader_ui") == 0)
++      config.context = Context::ReaderUi;
++    else
++      return false;
++  } else if (index < 4) {
++    char* destination = index == 1 ? config.host : index == 2 ? config.ssid : config.password;
++    const size_t capacity = index == 1   ? sizeof(config.host)
++                            : index == 2 ? sizeof(config.ssid)
++                                         : sizeof(config.password);
++    if (strlen(value) >= capacity || (index != 3 && !*value)) return false;
++    if (index == 1)
++      for (const char* p = value; *p; ++p) {
++        const bool allowed =
++            (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') || *p == '.' || *p == '-';
++        if (!allowed) return false;
++      }
++    strcpy(destination, value);
++  } else {
++    if (!*value) return false;
++    for (const char* p = value; *p; ++p)
++      if (*p < '0' || *p > '9') return false;
++    errno = 0;
++    char* end = nullptr;
++    const unsigned long number = strtoul(value, &end, 10);
++    if (errno || *end) return false;
++    if (index == 4) {
++      if (number < 1670000000UL || number > 2147483647UL) return false;
++      config.epoch = number;
++    } else {
++      if (number == 0 || number > 65535) return false;
++      config.ports[index - 5] = number;
++    }
++  }
++  config.seen |= 1U << index;
++  return true;
++}
++inline bool complete(const Config& config) { return config.seen == 1023; }
++}  // namespace tlsmemoryprobe
+diff --git a/src/util/TlsProbeWindow.h b/src/util/TlsProbeWindow.h
+new file mode 100644
+index 0000000..4147541
+--- /dev/null
++++ b/src/util/TlsProbeWindow.h
+@@ -0,0 +1,22 @@
++#pragma once
++#include <esp_heap_caps.h>
++namespace tlsmemoryprobe {
++class HeapWindow {
++ public:
++  HeapWindow() : startResult(heap_caps_monitor_local_minimum_free_size_start()) {}
++  ~HeapWindow() { finish(); }
++  HeapWindow(const HeapWindow&) = delete;
++  HeapWindow& operator=(const HeapWindow&) = delete;
++  bool owned() const { return startResult == ESP_OK; }
++  void finish() {
++    if (!owned() || stopCalled) return;
++    minimum = heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
++    stopResult = heap_caps_monitor_local_minimum_free_size_stop();
++    stopCalled = true;
++  }
++  const esp_err_t startResult;
++  esp_err_t stopResult = ESP_FAIL;
++  bool stopCalled = false;
++  size_t minimum = 0;
++};
++}  // namespace tlsmemoryprobe

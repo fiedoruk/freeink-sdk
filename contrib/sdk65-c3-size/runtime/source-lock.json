@@ -1,0 +1,64 @@
+{
+  "cp": {
+    "url": "https://github.com/crosspoint-reader/crosspoint-reader.git",
+    "commit": "fc3aed12100e3149cae6128a321c902f056786cc"
+  },
+  "sdk": {
+    "url": "https://github.com/Free-Ink/freeink-sdk.git",
+    "commit": "1a5448dfa705d6499fbff20371539bf553865dd2"
+  },
+  "target": "default",
+  "sdk65_pr_head_reference_only": "6d33e9fd8c6fd1c53c40c0ef1ccaa4535606610a",
+  "sdk14_sampling_reference": "34aabdf2c8045dc90df6ec1b95f974224d8fcf37",
+  "host_library": {
+    "package": "wolfssl/Arduino-wolfSSL@5.7.2",
+    "user_settings_sha256": "82fa06f8b7ded750a95acdb5bb0c9eef08247ea3d8b54f753a924fe7608e572b"
+  },
+  "files": {
+    "CP-LICENSE.txt": "5d025639b5237e35cf93c4ca598ebde40f31f032bf9a9a19fceb3703dca68b84",
+    "README.md": "74769b18c0358859ccee8da72bc3ebd738abe2975bfb20a12028990d21bb5c92",
+    "SDK-LICENSE.txt": "17dea5079d9905fbbc8323cde7bfffd0f24185949c43a5daad5177022b796588",
+    "build_wolfssl.py": "75bc73baf363c3ea1a1616786885e9a9c447cb560a6b138918bf2b46d310ba56",
+    "certificates.py": "82c4e8d233216d7767b34a60fd1e76b846e416975f1d4435d191bc4cfd6446b9",
+    "check_repair.py": "5217bb6d3e3591262c6b27e67f44b29837a193f572b25d4187f698d1b3e4b6c3",
+    "cp-runtime.patch": "e90314eb1ce13fdb96c93dc69c1a6d7ed7e387d2ee5de2fdf9f305d58b2019ad",
+    "fixture.py": "b54c04d8377d73897304b6135e8f322263c13e5ec68114aab5285689bf27759c",
+    "host/Contracts.cpp": "98c3c06697f717739190e7d50c0d0d47bf693ccec5c8e17240922eda9efbc128",
+    "host/Flow.cpp": "df0a335cb263eb5d58aa186031233e805ea4d07cc743b40a8331ba4d6c990479",
+    "host/NativeTls.cpp": "c982395c70846c666031245b5e2c5ab7464ca65ece25aecca1080abfad8ca9a6",
+    "host/flow_stubs/Arduino.h": "e2ebffc001fa2f6301381f4471c2885d2cc7b52c5ff2e9b19f1dd10d9b77a2ee",
+    "host/flow_stubs/HalPowerManager.h": "0c6b7d6134a5bb394e9c53224b13a8fce6d402754d52168c8eaddaa1e4fea686",
+    "host/flow_stubs/HalStorage.h": "bb494688e0ee0d1084ef20277e0517044f87098cf3754a7073c763057596395e",
+    "host/flow_stubs/Logging.h": "b0f6aef0088d8d6dd000ca320f058c6bcfb59916dfec67ab6dd7c463a0d2c81b",
+    "host/flow_stubs/SecureClient.h": "8e8fa70baf7eeefdf5e47066804b9ab41a5bd30c31f59059f4be005e332201d8",
+    "host/flow_stubs/WiFi.h": "1c96124fae229688ec3c6bf738d54b2a9302bb9980f46e4f614ddc1e59b1ab01",
+    "host/stubs/Arduino.h": "c461a4b848a22c498286cb21eb9ff5448c1e624ddd510607b2bb230cfc12b1f0",
+    "host/stubs/Client.h": "38f7b01ea41a0b0a92b0c49a7ae0b33c2513cbe4c9bf257c8148ccd2ae5576e1",
+    "host/stubs/HalPowerManager.h": "b4c742e34b24fdfd23f065944282585d60cd31d9223af71229553efa040dd06c",
+    "host/stubs/HalStorage.h": "5ca2e612bbad3cbd10b891a62aa00280f1e4f730f13344a7752a602c8e869b04",
+    "host/stubs/Logging.h": "96a9c0d66031a54528ce944d4047f4ba552a9333a1d0dc236e4ea5c3593f9a4e",
+    "host/stubs/WiFi.h": "934a666eb5e6ba576b62c8c3ab4b1e18bc4b2b852ce6a2d19183de3c6d82ec8f",
+    "host/stubs/WiFiClient.h": "3981ec0b67fcedbc19b8b5c806ceb36dbf097877a44c9d88fe9449a0df8a8a2d",
+    "host/stubs/esp_heap_caps.h": "2b4f26de51a4596c1c71b96b4ca74833baffccb16acee5a8bb3a21afa4f34acc",
+    "identity-template.json": "305e5d0f8fff207fb04d3db8af6efe3602d7735ecd8ad52b1047987ae2e4b9c1",
+    "parse_results.py": "0f81e332a6f1fe7fe6c5502d29ce6ca94c84f32d8292ed4eec3af2badb64ccb2",
+    "platformio.local.ini": "faa0fe91a974a71ce9c2dabbe77bda9c4076f6f8ebcb388e6b3c211eabb6b798",
+    "reproduce.py": "623027453b5652cc58ca7b5c71884f69a2566b1cb81121c1d635be004bb7ded9",
+    "run_host.py": "81bb165ecdc42d01f5c49985d39925f63ed611e80b030a68ad829e583cd66cd7",
+    "sdk-runtime.patch": "01f203969156a1840d106822d33ce15f0ab0cbd5ca6562eddaeefbbf0582f9e8",
+    "sdk65-compatible.patch": "a97e8a4192949cc8d59289694711a3a9c14bcb7d2b63f6f4461722afd549f35f",
+    "test_parser.py": "35e49e72d2c52700fac95da20210c88ca37a8d20efb32daa95a3163ce13fe99b",
+    "VALIDATION.md": "8c7b832c1cdd8569aa645dfe9f7e9abc491679c8eee2ff7c3d7d0ebba7eae215"
+  },
+  "result_files": {
+    "src/main.cpp": "01ebd2b24b86b8df5f08d34852a13fb3b28551a331179c421a2f3e97d1b3b861",
+    "src/activities/reader/EpubReaderActivity.cpp": "93b359b44ce76fa44b41fa5aa4946cb3d6af60054c2fc2b9804235433389023f",
+    "src/util/TlsMemoryProbe.cpp": "a6d94f7af69ef48494b9803df15206dc7efaa86cbadd536ce3a9c60da77fa952",
+    "src/util/TlsMemoryProbe.h": "6e56f2e4b1d15dedc05eaadb3af4e8d0325164278661f5277531487ea74ef675",
+    "src/util/TlsProbeConfig.h": "7b6457b450efbadd026e0336c3362834272a21e7c1bebc450b323630ebfaf2f0",
+    "src/util/TlsProbeWindow.h": "93508d506ae35604fc51942fd4a67f5047166ca52d1f915e5bac21c72961d47e",
+    "freeink-sdk/libs/network/SecureNet/src/SecureClient.cpp": "2ca4900baf151616e005dbe6d0e14cba70292941d305f2d036b033a6bad39ec9",
+    "freeink-sdk/libs/network/SecureNet/include/SecureClient.h": "1b64e9d51ea6f29814b180cfe52c445a47b0392aa831dee655530ec60cd46fb3",
+    "platformio.local.ini": "faa0fe91a974a71ce9c2dabbe77bda9c4076f6f8ebcb388e6b3c211eabb6b798"
+  }
+}
